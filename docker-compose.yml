@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: air_quality_db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: air_quality
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: local_dev_password
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d air_quality"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
